@@ -12,6 +12,36 @@ filename = 'mirrorlist'
 filenew = 'mirrorlist.pacnew'
 comment = '^#\\s*'
 uncomment = 'https.*'
+help_str = """\
+Usage: mirrormove.py [OPTIONS]
+mirrormove uncomments specified lines from the pacman mirrorlist
+The following options are available:
+
+    -p path     Sets the path to search for mirrorlists in
+                (default: {})
+
+    -s start    Sets the regex to search for to start uncommenting lines
+                (default: {})
+
+    -e end      Sets the regex to search for to stop uncommenting lines
+                (default: {})
+
+    -f filename Sets the filename to save the new mirrorlist as
+                (default: {})
+
+    -n filenew  Sets the name for the .pacnew file
+                (default: {})
+
+    -c comment  Sets the regex to match the comment portion of a line with
+                (default: {})
+
+    -u uncomment    Sets the regex to search for in lines that should be
+                uncommented
+                (default: {})
+
+    -h          Prints this help message and quits
+    -?
+""".format(path, line_start, line_end, filename, filenew, comment, uncomment)
 
 
 def get_uncomment_indices(lines):
@@ -54,15 +84,17 @@ def save_mirrorlist(lines):
     if hasattr(lines, '__iter__'):
         lines = '\n'.join(lines) + '\n'
 
+    write_filename = os.path.abspath(path + '/' + filename)
+
     try:
-        file = open('{}/{}'.format(path, filename), 'w')
+        file = open(write_filename, 'w')
 
         file.write(lines)
 
         file.close()
     except (OSError, IOError) as error:
         print(error)
-        print('\nerror writing to "{}/{}"; did you run as root?'.format(path, filename))
+        print('\nerror writing to "{}"; did you run as root?'.format(write_filename))
 
 
 def parse_args(argv):
@@ -94,6 +126,10 @@ def parse_args(argv):
         global uncomment
         uncomment = uncomment_
 
+    def print_help():
+        print(help_str)
+        quit()
+
     arg_logic = {
         'p': set_path,
         's': set_line_start,
@@ -101,7 +137,9 @@ def parse_args(argv):
         'f': set_filename,
         'n': set_filenew,
         'c': set_comment,
-        'u': set_uncomment
+        'u': set_uncomment,
+        'h': print_help,
+        '?': print_help
     }
 
     i = 1
