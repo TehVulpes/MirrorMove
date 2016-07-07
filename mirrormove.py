@@ -59,8 +59,11 @@ def get_uncomment_indices(lines):
 
 
 def uncomment_lines(lines):
+    print('Uncommenting the following lines...')
+
     for i in get_uncomment_indices(lines):
         lines[i] = re.sub(comment, '', lines[i])
+        print(lines[i])
 
     return lines
 
